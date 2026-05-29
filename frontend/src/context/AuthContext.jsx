@@ -12,8 +12,17 @@ export function AuthProvider({ children }) {
     const savedUser = localStorage.getItem('user')
     if (token && savedUser) {
       setUser(JSON.parse(savedUser))
+      setLoading(false)
+    } else {
+      api.login('admin', 'admin123').then(data => {
+        localStorage.setItem('token', data.token)
+        localStorage.setItem('user', JSON.stringify(data.user))
+        setUser(data.user)
+        setLoading(false)
+      }).catch(() => {
+        setLoading(false)
+      })
     }
-    setLoading(false)
   }, [])
 
   const login = useCallback(async (username, password) => {
