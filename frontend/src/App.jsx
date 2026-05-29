@@ -22,7 +22,7 @@ function PrivateRoute({ children }) {
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <BrowserRouter basename="/TestingDummyNomina">
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>

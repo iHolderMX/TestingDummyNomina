@@ -2,16 +2,16 @@ const now = new Date()
 const today = now.toISOString().slice(0, 10)
 
 const workers = [
-  { id: 1, internal_id: 'W-001', name: 'Juan Pérez López', role_title: 'Albañil', weekly_salary: 2800, contractor_id: 1, active: 1, contractor_name: 'Construcciones y Edificaciones Profesionales S.A. de C.V.' },
-  { id: 2, internal_id: 'W-002', name: 'María García Hernández', role_title: 'Ayudante General', weekly_salary: 2100, contractor_id: 1, active: 1, contractor_name: 'Construcciones y Edificaciones Profesionales S.A. de C.V.' },
-  { id: 3, internal_id: 'W-003', name: 'Carlos Martínez Rodríguez', role_title: 'Plomero', weekly_salary: 3200, contractor_id: 2, active: 1, contractor_name: 'Instalaciones y Servicios Técnicos Integrales S.A.' },
-  { id: 4, internal_id: 'W-004', name: 'Ana Sánchez Cruz', role_title: 'Electricista', weekly_salary: 3500, contractor_id: 2, active: 1, contractor_name: 'Instalaciones y Servicios Técnicos Integrales S.A.' },
-  { id: 5, internal_id: 'W-005', name: 'José Ramírez Morales', role_title: 'Carpintero', weekly_salary: 3000, contractor_id: 1, active: 1, contractor_name: 'Construcciones y Edificaciones Profesionales S.A. de C.V.' },
-  { id: 6, internal_id: 'W-006', name: 'Luis Torres Vega', role_title: 'Soldador', weekly_salary: 3400, contractor_id: null, active: 1, contractor_name: null },
-  { id: 7, internal_id: 'W-007', name: 'Mónica Rangel Soto', role_title: 'Arquitecta', weekly_salary: 4500, contractor_id: 1, active: 1, contractor_name: 'Construcciones y Edificaciones Profesionales S.A. de C.V.' },
-  { id: 8, internal_id: 'W-008', name: 'Roberto Delgado Núñez', role_title: 'Pintor', weekly_salary: 2500, contractor_id: 2, active: 1, contractor_name: 'Instalaciones y Servicios Técnicos Integrales S.A.' },
-  { id: 9, internal_id: 'W-009', name: 'Laura Mendoza Ortiz', role_title: 'Supervisora', weekly_salary: 4200, contractor_id: null, active: 1, contractor_name: null },
-  { id: 10, internal_id: 'W-010', name: 'Pedro Castillo Silva', role_title: 'Ayudante General', weekly_salary: 2000, contractor_id: 1, active: 1, contractor_name: 'Construcciones y Edificaciones Profesionales S.A. de C.V.' },
+  { id: 1, internal_id: 'W-001', qr_code: 'W-001', name: 'Juan Pérez López', role_title: 'Albañil', weekly_salary: 2800, contractor_id: 1, active: 1, contractor_name: 'Construcciones y Edificaciones Profesionales S.A. de C.V.' },
+  { id: 2, internal_id: 'W-002', qr_code: 'W-002', name: 'María García Hernández', role_title: 'Ayudante General', weekly_salary: 2100, contractor_id: 1, active: 1, contractor_name: 'Construcciones y Edificaciones Profesionales S.A. de C.V.' },
+  { id: 3, internal_id: 'W-003', qr_code: 'W-003', name: 'Carlos Martínez Rodríguez', role_title: 'Plomero', weekly_salary: 3200, contractor_id: 2, active: 1, contractor_name: 'Instalaciones y Servicios Técnicos Integrales S.A.' },
+  { id: 4, internal_id: 'W-004', qr_code: 'W-004', name: 'Ana Sánchez Cruz', role_title: 'Electricista', weekly_salary: 3500, contractor_id: 2, active: 1, contractor_name: 'Instalaciones y Servicios Técnicos Integrales S.A.' },
+  { id: 5, internal_id: 'W-005', qr_code: 'W-005', name: 'José Ramírez Morales', role_title: 'Carpintero', weekly_salary: 3000, contractor_id: 1, active: 1, contractor_name: 'Construcciones y Edificaciones Profesionales S.A. de C.V.' },
+  { id: 6, internal_id: 'W-006', qr_code: 'W-006', name: 'Luis Torres Vega', role_title: 'Soldador', weekly_salary: 3400, contractor_id: null, active: 1, contractor_name: null },
+  { id: 7, internal_id: 'W-007', qr_code: 'W-007', name: 'Mónica Rangel Soto', role_title: 'Arquitecta', weekly_salary: 4500, contractor_id: 1, active: 1, contractor_name: 'Construcciones y Edificaciones Profesionales S.A. de C.V.' },
+  { id: 8, internal_id: 'W-008', qr_code: 'W-008', name: 'Roberto Delgado Núñez', role_title: 'Pintor', weekly_salary: 2500, contractor_id: 2, active: 1, contractor_name: 'Instalaciones y Servicios Técnicos Integrales S.A.' },
+  { id: 9, internal_id: 'W-009', qr_code: 'W-009', name: 'Laura Mendoza Ortiz', role_title: 'Supervisora', weekly_salary: 4200, contractor_id: null, active: 1, contractor_name: null },
+  { id: 10, internal_id: 'W-010', qr_code: 'W-010', name: 'Pedro Castillo Silva', role_title: 'Ayudante General', weekly_salary: 2000, contractor_id: 1, active: 1, contractor_name: 'Construcciones y Edificaciones Profesionales S.A. de C.V.' },
 ]
 
 const worksites = [
@@ -220,6 +220,29 @@ export const mockApi = {
     await delay()
     let result = [...attendanceSummary]
     return result
+  },
+
+  async scanQR(qr_code, worksite_id) {
+    await delay(500)
+    const worker = workers.find(w => w.qr_code === qr_code)
+    if (!worker) throw new Error('Trabajador no encontrado')
+    const existing = attendanceRecords.find(r => r.worker_id === worker.id && r.date === today)
+    if (existing && existing.status === 'presente') {
+      return { status: 'duplicate', message: 'El trabajador ya registró asistencia hoy' }
+    }
+    const rec = {
+      id: attendanceRecords.length + 1,
+      worker_id: worker.id,
+      worker_name: worker.name,
+      worker_internal_id: worker.internal_id,
+      role_title: worker.role_title,
+      date: today,
+      check_in: '07:00',
+      status: 'presente',
+      worksite_id: Number(worksite_id),
+    }
+    attendanceRecords.push(rec)
+    return { status: 'ok', worker_name: worker.name, attendance: { date: today, entry_time: '07:00' } }
   },
 
   async scanAttendance(workerInternalId) {
