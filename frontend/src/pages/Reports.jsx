@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api.js'
+import { Building2, Users, TrendingUp, DollarSign, CalendarDays, ChevronDown, ChevronUp, Trophy, ClipboardList } from 'lucide-react'
 
 export default function Reports() {
   const [data, setData] = useState({ contractors: [], overtime: [], netPay: [], worksiteSum: [], contractorSum: [], daily: [] })
@@ -21,56 +22,71 @@ export default function Reports() {
     })
   }, [])
 
-  if (loading) return <div className="text-gray-500">Cargando reportes...</div>
+  if (loading) return (
+    <div className="flex items-center justify-center h-64">
+      <div className="animate-pulse text-gray-400">Cargando reportes...</div>
+    </div>
+  )
 
   const tabs = [
-    { key: 'overtime', label: 'Top Horas Extra' },
-    { key: 'netpay', label: 'Top Sueldo Neto' },
-    { key: 'contractors', label: 'Contratistas x Obra' },
-    { key: 'worksites', label: 'Resumen por Obra' },
-    { key: 'daily', label: 'Asistencia Diaria' },
+    { key: 'overtime', label: 'Top Horas Extra', icon: Trophy },
+    { key: 'netpay', label: 'Top Sueldo Neto', icon: DollarSign },
+    { key: 'contractors', label: 'Contratistas x Obra', icon: ClipboardList },
+    { key: 'worksites', label: 'Resumen por Obra', icon: Building2 },
+    { key: 'daily', label: 'Asistencia Diaria', icon: CalendarDays },
   ]
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">Reportes</h2>
+      <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+        <TrendingUp size={24} className="text-amber-600" />
+        Reportes
+      </h2>
 
       <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
         {tabs.map(t => (
           <button key={t.key} onClick={() => setTab(t.key)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
-              tab === t.key ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
+              tab === t.key
+                ? 'bg-gray-900 text-white shadow-md'
+                : 'bg-white text-gray-600 border border-gray-200 hover:border-gray-300 hover:bg-gray-50'
             }`}>
+            <t.icon size={16} />
             {t.label}
           </button>
         ))}
       </div>
 
       {tab === 'overtime' && (
-        <div className="card overflow-x-auto">
-          <h3 className="font-semibold text-gray-900 mb-4">🏆 Top Trabajadores con Más Horas Extra</h3>
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-x-auto">
+          <div className="p-5 border-b border-gray-100">
+            <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+              <Trophy size={18} className="text-amber-500" />
+              Top Trabajadores con Más Horas Extra
+            </h3>
+          </div>
           <table className="w-full">
             <thead>
-              <tr className="border-b border-gray-100">
-                <th className="table-header">#</th>
-                <th className="table-header">Trabajador</th>
-                <th className="table-header">Puesto</th>
-                <th className="table-header">Obra</th>
-                <th className="table-header">Horas Extra</th>
-                <th className="table-header">Pago HE</th>
+              <tr className="border-b border-gray-50 bg-gray-50/30">
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">#</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Trabajador</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Puesto</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Horas Extra</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Pago HE</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-gray-50">
               {data.overtime.map((item, i) => (
-                <tr key={i} className="border-b border-gray-50 hover:bg-gray-50">
-                  <td className="table-cell font-bold">{i + 1}</td>
-                  <td className="table-cell font-medium">{item.worker_name}</td>
-                  <td className="table-cell">{item.role_title}</td>
-                  <td className="table-cell">{item.worksite_name}</td>
-                  <td className="table-cell">
-                    <span className="badge badge-yellow">{item.total_overtime_hours}h</span>
+                <tr key={i} className="hover:bg-gray-50/50">
+                  <td className="px-4 py-3 font-bold text-gray-400">{i + 1}</td>
+                  <td className="px-4 py-3 font-medium text-gray-900">{item.name || item.worker_name}</td>
+                  <td className="px-4 py-3 text-gray-600">{item.role_title}</td>
+                  <td className="px-4 py-3">
+                    <span className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">
+                      {item.overtime_hours || item.total_overtime_hours || 0}h
+                    </span>
                   </td>
-                  <td className="table-cell font-medium">${item.total_overtime_pay?.toLocaleString()}</td>
+                  <td className="px-4 py-3 font-medium text-gray-800">${(item.overtime_pay || item.total_overtime_pay || 0)?.toLocaleString()}</td>
                 </tr>
               ))}
             </tbody>
@@ -79,32 +95,33 @@ export default function Reports() {
       )}
 
       {tab === 'netpay' && (
-        <div className="card overflow-x-auto">
-          <h3 className="font-semibold text-gray-900 mb-4">💰 Top Trabajadores por Sueldo Neto</h3>
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-x-auto">
+          <div className="p-5 border-b border-gray-100">
+            <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+              <DollarSign size={18} className="text-indigo-500" />
+              Top Trabajadores por Sueldo Neto
+            </h3>
+          </div>
           <table className="w-full">
             <thead>
-              <tr className="border-b border-gray-100">
-                <th className="table-header">#</th>
-                <th className="table-header">Trabajador</th>
-                <th className="table-header">Puesto</th>
-                <th className="table-header">Obra</th>
-                <th className="table-header">Contratista</th>
-                <th className="table-header">Devengado</th>
-                <th className="table-header">Deducciones</th>
-                <th className="table-header">Neto</th>
+              <tr className="border-b border-gray-50 bg-gray-50/30">
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">#</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Trabajador</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Puesto</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Devengado</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Deducciones</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Neto</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-gray-50">
               {data.netPay.map((item, i) => (
-                <tr key={i} className="border-b border-gray-50 hover:bg-gray-50">
-                  <td className="table-cell font-bold">{i + 1}</td>
-                  <td className="table-cell font-medium">{item.worker_name}</td>
-                  <td className="table-cell">{item.role_title}</td>
-                  <td className="table-cell">{item.worksite_name}</td>
-                  <td className="table-cell">{item.contractor_name || 'Directo'}</td>
-                  <td className="table-cell">${item.total_devengado.toLocaleString()}</td>
-                  <td className="table-cell text-red-600">${item.total_deducciones.toLocaleString()}</td>
-                  <td className="table-cell font-bold text-blue-600">${item.total_neto.toLocaleString()}</td>
+                <tr key={i} className="hover:bg-gray-50/50">
+                  <td className="px-4 py-3 font-bold text-gray-400">{i + 1}</td>
+                  <td className="px-4 py-3 font-medium text-gray-900">{item.name || item.worker_name}</td>
+                  <td className="px-4 py-3 text-gray-600">{item.role_title}</td>
+                  <td className="px-4 py-3 text-gray-800">${(item.total_devengado || 0).toLocaleString()}</td>
+                  <td className="px-4 py-3 text-red-600">${(item.total_deducciones || 0).toLocaleString()}</td>
+                  <td className="px-4 py-3 font-bold text-indigo-600">${item.total_neto.toLocaleString()}</td>
                 </tr>
               ))}
             </tbody>
@@ -113,24 +130,32 @@ export default function Reports() {
       )}
 
       {tab === 'contractors' && (
-        <div className="card overflow-x-auto">
-          <h3 className="font-semibold text-gray-900 mb-4">📋 Contratistas con Más Obras</h3>
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-x-auto">
+          <div className="p-5 border-b border-gray-100">
+            <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+              <ClipboardList size={18} className="text-blue-500" />
+              Contratistas por Obra
+            </h3>
+          </div>
           <table className="w-full">
             <thead>
-              <tr className="border-b border-gray-100">
-                <th className="table-header">Contratista</th>
-                <th className="table-header">Obras</th>
-                <th className="table-header">Detalle</th>
+              <tr className="border-b border-gray-50 bg-gray-50/30">
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Contratista</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Obra</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Trabajadores</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-gray-50">
               {data.contractors.map((item, i) => (
-                <tr key={i} className="border-b border-gray-50 hover:bg-gray-50">
-                  <td className="table-cell font-medium">{item.contractor_name}</td>
-                  <td className="table-cell">
-                    <span className="badge badge-blue">{item.worksite_count}</span>
+                <tr key={i} className="hover:bg-gray-50/50">
+                  <td className="px-4 py-3 font-medium text-gray-900">{item.contractor_name}</td>
+                  <td className="px-4 py-3 text-gray-600">{item.worksite_names || item.worksite_name}</td>
+                  <td className="px-4 py-3">
+                    <span className="inline-flex items-center gap-1.5 text-sm">
+                      <Users size={14} className="text-gray-400" />
+                      <span className="font-medium">{item.worksite_count || item.worker_count}</span>
+                    </span>
                   </td>
-                  <td className="table-cell text-sm text-gray-500">{item.worksite_names}</td>
                 </tr>
               ))}
             </tbody>
@@ -139,28 +164,31 @@ export default function Reports() {
       )}
 
       {tab === 'worksites' && (
-        <div className="card overflow-x-auto">
-          <h3 className="font-semibold text-gray-900 mb-4">🏗️ Resumen Financiero por Obra</h3>
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-x-auto">
+          <div className="p-5 border-b border-gray-100">
+            <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+              <Building2 size={18} className="text-emerald-500" />
+              Resumen Financiero por Obra
+            </h3>
+          </div>
           <table className="w-full">
             <thead>
-              <tr className="border-b border-gray-100">
-                <th className="table-header">Obra</th>
-                <th className="table-header">Trabajadores</th>
-                <th className="table-header">Total Devengado</th>
-                <th className="table-header">Total Deducciones</th>
-                <th className="table-header">Total Neto</th>
-                <th className="table-header">Días Totales</th>
+              <tr className="border-b border-gray-50 bg-gray-50/30">
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Obra</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Trabajadores</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Devengado</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Deducciones</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Neto</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-gray-50">
               {data.worksiteSum.map((item, i) => (
-                <tr key={i} className="border-b border-gray-50 hover:bg-gray-50">
-                  <td className="table-cell font-medium">{item.worksite_name}</td>
-                  <td className="table-cell">{item.worker_count}</td>
-                  <td className="table-cell">${item.total_devengado.toLocaleString()}</td>
-                  <td className="table-cell text-red-600">${item.total_deducciones.toLocaleString()}</td>
-                  <td className="table-cell font-bold text-blue-600">${item.total_neto.toLocaleString()}</td>
-                  <td className="table-cell">{item.total_days}</td>
+                <tr key={i} className="hover:bg-gray-50/50">
+                  <td className="px-4 py-3 font-medium text-gray-900">{item.name || item.worksite_name}</td>
+                  <td className="px-4 py-3 text-gray-600">{item.worker_count}</td>
+                  <td className="px-4 py-3 text-gray-800">${item.total_devengado.toLocaleString()}</td>
+                  <td className="px-4 py-3 text-red-600">${item.total_deducciones.toLocaleString()}</td>
+                  <td className="px-4 py-3 font-bold text-emerald-600">${item.total_neto.toLocaleString()}</td>
                 </tr>
               ))}
             </tbody>
@@ -169,31 +197,42 @@ export default function Reports() {
       )}
 
       {tab === 'daily' && (
-        <div className="card overflow-x-auto">
-          <h3 className="font-semibold text-gray-900 mb-4">📅 Asistencia Diaria</h3>
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-x-auto">
+          <div className="p-5 border-b border-gray-100">
+            <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+              <CalendarDays size={18} className="text-blue-500" />
+              Asistencia Diaria
+            </h3>
+          </div>
           <table className="w-full">
             <thead>
-              <tr className="border-b border-gray-100">
-                <th className="table-header">Fecha</th>
-                <th className="table-header">Presentes</th>
-                <th className="table-header">Faltas</th>
-                <th className="table-header">Total</th>
-                <th className="table-header">% Asistencia</th>
+              <tr className="border-b border-gray-50 bg-gray-50/30">
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Fecha</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Presentes</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Faltas</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Total</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">% Asistencia</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-gray-50">
               {data.daily.map((item, i) => (
-                <tr key={i} className="border-b border-gray-50 hover:bg-gray-50">
-                  <td className="table-cell font-medium">{item.date}</td>
-                  <td className="table-cell">
-                    <span className="badge badge-green">{item.presentes}</span>
+                <tr key={i} className="hover:bg-gray-50/50">
+                  <td className="px-4 py-3 font-medium text-gray-900">{item.date}</td>
+                  <td className="px-4 py-3">
+                    <span className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">{item.presentes}</span>
                   </td>
-                  <td className="table-cell">
-                    {item.faltas > 0 ? <span className="badge badge-red">{item.faltas}</span> : <span className="badge badge-green">0</span>}
+                  <td className="px-4 py-3">
+                    {item.faltas > 0
+                      ? <span className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200">{item.faltas}</span>
+                      : <span className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">0</span>
+                    }
                   </td>
-                  <td className="table-cell">{item.total}</td>
-                  <td className="table-cell">
-                    {item.total > 0 ? ((item.presentes / item.total) * 100).toFixed(0) + '%' : 'N/A'}
+                  <td className="px-4 py-3 text-gray-600">{item.total}</td>
+                  <td className="px-4 py-3">
+                    {item.total > 0
+                      ? <span className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">{((item.presentes / item.total) * 100).toFixed(0)}%</span>
+                      : <span className="text-gray-400">N/A</span>
+                    }
                   </td>
                 </tr>
               ))}
