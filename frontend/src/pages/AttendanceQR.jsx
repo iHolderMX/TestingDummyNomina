@@ -3,13 +3,12 @@ import { api } from '../api.js'
 import { QrCode, ChevronDown, ChevronUp, HelpCircle, MapPin, User, CheckCircle2, AlertTriangle, XCircle } from 'lucide-react'
 
 const preguntasAsistencia = [
-  '¿La confirmación posterior al QR será requerida o el QR basta?',
-  '¿Qué pasa si el QR se escanea en la obra incorrecta?',
-  '¿Qué pasa si el trabajador no está asignado a la obra?',
-  '¿Debe funcionar offline?',
-  '¿Debe validarse dispositivo autorizado?',
-  '¿Cómo se distingue baja, salida y cambio de obra?',
-  '¿Qué evidencia se conserva además del QR?',
+  'La confirmacion posterior al QR sera requerida o el QR basta?',
+  'Que pasa si el QR se escanea en la obra incorrecta?',
+  'Debe funcionar offline?',
+  'Debe validarse dispositivo autorizado?',
+  'Que evidencia se conserva ademas del QR?',
+  'Como se notifica la hora de salida?',
 ]
 
 export default function AttendanceQR() {

@@ -3,15 +3,12 @@ import { api } from '../api.js'
 import { DollarSign, Building2, ChevronDown, ChevronUp, HelpCircle, Edit3, X, Save } from 'lucide-react'
 
 const preguntasPreNomina = [
-  '¿La fórmula sueldo_diario = sueldo_semanal / 6 aplica a todos los trabajadores?',
-  '¿Cómo se debe tratar domingo?',
-  '¿Cómo se manejan festivos oficiales?',
-  '¿Retardos: monto fijo, porcentaje del sueldo o a partir de cuántos minutos?',
-  '¿IMSS e Infonavit se capturan manualmente o se calcularán automáticamente?',
-  '¿ISR queda fuera del MVP o debe contemplarse?',
-  '¿Alimentos, viáticos y bonos son por día, por semana, por trabajador o captura libre?',
-  '¿Cuándo se cierra la pre-nómina?',
-  '¿Quién puede reabrir o corregir un período cerrado?',
+  'ISR queda fuera del MVP o debe contemplarse?',
+  'Alimentos, viaticos y bonos son por dia, por semana, por trabajador o captura libre?',
+  'Cuando se cierra la pre-nomina?',
+  'Quien puede reabrir o corregir un periodo cerrado?',
+  'Bono de puntualidad: como se calcula?',
+  'Como se muestran costos IMSS/Infonavit de trabajadores dados de baja?',
 ]
 
 export default function Payroll() {

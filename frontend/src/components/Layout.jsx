@@ -2,7 +2,7 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import {
   LayoutDashboard, Users, Building2, Briefcase, QrCode,
-  CalendarCheck, DollarSign, TrendingUp, ShieldCheck, LogOut
+  CalendarCheck, DollarSign, TrendingUp, ShieldCheck, LogOut, FileBadge, BarChart3
 } from 'lucide-react'
 
 const navItems = [
@@ -14,6 +14,8 @@ const navItems = [
   { path: '/resumen-asistencia', label: 'Resumen Asist.', icon: CalendarCheck },
   { path: '/pre-nomina', label: 'Pre-Nómina', icon: DollarSign },
   { path: '/reportes', label: 'Reportes', icon: TrendingUp },
+  { path: '/fuerza-trabajo', label: 'Fuerza Trabajo', icon: BarChart3 },
+  { path: '/certificaciones', label: 'DS3 / Certif.', icon: FileBadge },
   { path: '/auditoria', label: 'Auditoría', icon: ShieldCheck },
 ]
 
@@ -21,11 +23,7 @@ export default function Layout() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
 
-  const handleLogout = () => {
-    logout()
-    navigate('/login')
-  }
-
+  const handleLogout = () => { logout(); navigate('/login') }
   const roleLabels = { admin: 'Administrador', encargado: 'Encargado de Obra', nomina: 'Nómina', contratista: 'Contratista' }
 
   return (
@@ -38,27 +36,17 @@ export default function Layout() {
           </h1>
           <p className="text-gray-400 text-xs mt-1">Control de Asistencia</p>
         </div>
-
         <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
           {navItems.map(item => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              end={item.path === '/'}
+            <NavLink key={item.path} to={item.path} end={item.path === '/'}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
-                  isActive
-                    ? 'bg-blue-50 text-blue-700 shadow-sm'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`
-              }
-            >
-              <item.icon size={18} />
-              <span>{item.label}</span>
+                  isActive ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                }`}>
+              <item.icon size={18} /><span>{item.label}</span>
             </NavLink>
           ))}
         </nav>
-
         <div className="p-4 border-t border-gray-100">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-bold">
@@ -70,16 +58,12 @@ export default function Layout() {
             </div>
           </div>
           <button onClick={handleLogout} className="mt-3 w-full flex items-center gap-1.5 text-gray-400 text-xs hover:text-red-600 transition-colors">
-            <LogOut size={14} />
-            Cerrar sesión
+            <LogOut size={14} />Cerrar sesión
           </button>
         </div>
       </aside>
-
       <main className="flex-1 overflow-y-auto bg-gray-50">
-        <div className="p-6 max-w-7xl mx-auto">
-          <Outlet />
-        </div>
+        <div className="p-6 max-w-7xl mx-auto"><Outlet /></div>
       </main>
     </div>
   )

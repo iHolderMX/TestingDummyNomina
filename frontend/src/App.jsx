@@ -11,6 +11,8 @@ import AttendanceSummary from './pages/AttendanceSummary.jsx'
 import Payroll from './pages/Payroll.jsx'
 import AuditLog from './pages/AuditLog.jsx'
 import Reports from './pages/Reports.jsx'
+import FuerzaTrabajo from './pages/FuerzaTrabajo.jsx'
+import Certificaciones from './pages/Certificaciones.jsx'
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth()
@@ -35,6 +37,8 @@ export default function App() {
             <Route path="pre-nomina" element={<Payroll />} />
             <Route path="auditoria" element={<AuditLog />} />
             <Route path="reportes" element={<Reports />} />
+            <Route path="fuerza-trabajo" element={<FuerzaTrabajo />} />
+            <Route path="certificaciones" element={<Certificaciones />} />
           </Route>
         </Routes>
       </BrowserRouter>
