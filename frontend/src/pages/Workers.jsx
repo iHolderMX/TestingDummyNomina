@@ -1,15 +1,22 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api.js'
-import { Users, BadgeCheck, XCircle, Phone, MapPin, ShieldCheck, AlertTriangle, DollarSign } from 'lucide-react'
+import { Users, BadgeCheck, XCircle, Phone, MapPin, ShieldCheck, AlertTriangle, DollarSign, ChevronLeft, ChevronRight } from 'lucide-react'
+
+const PAGE_SIZES = [5, 10, 15, 20]
 
 export default function Workers() {
   const [workers, setWorkers] = useState([])
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState(null)
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
 
   useEffect(() => {
     api.getWorkers().then(data => { setWorkers(data); setLoading(false) })
   }, [])
+
+  const totalPages = Math.ceil(workers.length / pageSize)
+  const paginated = workers.slice((page - 1) * pageSize, page * pageSize)
 
   if (loading) return (
     <div className="flex items-center justify-center h-64">
@@ -25,7 +32,7 @@ export default function Workers() {
             <Users size={24} className="text-blue-600" />
             Trabajadores
           </h2>
-          <p className="text-gray-500 text-sm mt-1">10 registros — clic en un trabajador para ver detalle</p>
+          <p className="text-gray-500 text-sm mt-1">{workers.length} registros — mostrando {(page-1)*pageSize+1}-{Math.min(page*pageSize, workers.length)} — clic en fila para ver detalle</p>
         </div>
       </div>
 
@@ -43,7 +50,7 @@ export default function Workers() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {workers.map(w => (
+            {paginated.map(w => (
               <tr key={w.id} onClick={() => setSelected(selected?.id === w.id ? null : w)}
                 className={`cursor-pointer transition-colors ${selected?.id === w.id ? 'bg-blue-50/50' : 'hover:bg-gray-50/50'}`}>
                 <td className="px-3 py-3 font-mono text-xs text-gray-500">{w.internal_id}</td>
@@ -79,6 +86,44 @@ export default function Workers() {
           </tbody>
         </table>
       </div>
+
+      {workers.length > pageSize && (
+        <div className="flex items-center justify-between mt-4 px-2">
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <span>Mostrar</span>
+            <select value={pageSize} onChange={e => { setPageSize(Number(e.target.value)); setPage(1) }}
+              className="border border-gray-200 rounded-lg px-2 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+              {PAGE_SIZES.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+            <span>por página</span>
+          </div>
+
+          <div className="flex items-center gap-1">
+            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
+              className="flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-lg border border-gray-200 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors">
+              <ChevronLeft size={15} />Anterior
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1)
+              .filter(p => p === 1 || p === totalPages || Math.abs(p - page) <= 1)
+              .map((p, idx, arr) => {
+                const showEllipsis = idx > 0 && arr[idx - 1] !== p - 1
+                return (
+                  <span key={p} className="flex items-center">
+                    {showEllipsis && <span className="px-1 text-gray-300">...</span>}
+                    <button onClick={() => setPage(p)}
+                      className={`w-9 h-9 rounded-lg text-sm font-medium transition-colors ${
+                        p === page ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100'
+                      }`}>{p}</button>
+                  </span>
+                )
+              })}
+            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
+              className="flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-lg border border-gray-200 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors">
+              Siguiente<ChevronRight size={15} />
+            </button>
+          </div>
+        </div>
+      )}
 
       {selected && (
         <div className="mt-6 bg-white rounded-xl border border-blue-100 shadow-sm overflow-hidden">
