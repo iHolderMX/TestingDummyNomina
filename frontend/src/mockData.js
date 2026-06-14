@@ -484,10 +484,14 @@ export const mockApi = {
     await delay()
     return {
       roles: [
-        { key: 'admin', label: 'Administrador', description: 'Acceso completo a todos los módulos. Puede crear, editar, eliminar, corregir y auditar.' },
-        { key: 'encargado', label: 'Encargado de Obra', description: 'Gestión limitada a su obra asignada. Registra asistencia, ve trabajadores de su obra.' },
-        { key: 'nomina', label: 'Encargado de Nómina', description: 'Calcula, corrige y cierra nóminas. Acceso a reportes financieros.' },
-        { key: 'contratista', label: 'Contratista', description: 'Consulta reportes de sus trabajadores asignados. Sin permisos de escritura.' },
+        { key: 'admin', label: 'Administrador', description: 'Acceso completo a todos los módulos. Puede crear, editar, eliminar, corregir y auditar.',
+          groups: ['gestion_trabajadores','gestion_obras','gestion_asistencia','gestion_nomina','reportes','seguridad','certificaciones'] },
+        { key: 'encargado', label: 'Encargado de Obra', description: 'Gestión limitada a su obra asignada. Registra asistencia, ve trabajadores de su obra.',
+          groups: ['gestion_trabajadores','gestion_obras','gestion_asistencia','gestion_nomina','reportes','certificaciones'] },
+        { key: 'nomina', label: 'Encargado de Nómina', description: 'Calcula, corrige y cierra nóminas. Acceso a reportes financieros.',
+          groups: ['gestion_trabajadores','gestion_obras','gestion_asistencia','gestion_nomina','reportes','certificaciones'] },
+        { key: 'contratista', label: 'Contratista', description: 'Consulta reportes de sus trabajadores asignados. Sin permisos de escritura.',
+          groups: ['gestion_trabajadores','gestion_nomina','reportes'] },
       ],
       users: [
         { id: 1, name: 'Admin Demo', email: 'admin@constructora.com', role: 'admin', active: true, filtro: 'Global' },
