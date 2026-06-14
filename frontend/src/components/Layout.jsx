@@ -2,7 +2,7 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import {
   LayoutDashboard, Users, Building2, Briefcase, QrCode,
-  CalendarCheck, DollarSign, TrendingUp, ShieldCheck, LogOut, FileBadge, BarChart3
+  CalendarCheck, DollarSign, TrendingUp, ShieldCheck, LogOut, FileBadge, BarChart3, Shield
 } from 'lucide-react'
 
 const navItems = [
@@ -16,6 +16,7 @@ const navItems = [
   { path: '/reportes', label: 'Reportes', icon: TrendingUp },
   { path: '/fuerza-trabajo', label: 'Fuerza Trabajo', icon: BarChart3 },
   { path: '/certificaciones', label: 'DS3 / Certif.', icon: FileBadge },
+  { path: '/rbac', label: 'RBAC', icon: Shield },
   { path: '/auditoria', label: 'Auditoría', icon: ShieldCheck },
 ]
 

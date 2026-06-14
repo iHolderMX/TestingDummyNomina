@@ -13,6 +13,7 @@ import AuditLog from './pages/AuditLog.jsx'
 import Reports from './pages/Reports.jsx'
 import FuerzaTrabajo from './pages/FuerzaTrabajo.jsx'
 import Certificaciones from './pages/Certificaciones.jsx'
+import Rbac from './pages/Rbac.jsx'
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth()
@@ -39,6 +40,7 @@ export default function App() {
             <Route path="reportes" element={<Reports />} />
             <Route path="fuerza-trabajo" element={<FuerzaTrabajo />} />
             <Route path="certificaciones" element={<Certificaciones />} />
+            <Route path="rbac" element={<Rbac />} />
           </Route>
         </Routes>
       </BrowserRouter>

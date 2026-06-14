@@ -479,4 +479,53 @@ export const mockApi = {
       estado: !w.ds3_activo ? 'pendiente' : (w.ds3_vigencia && new Date(w.ds3_vigencia) < now ? 'vencido' : (w.ds3_vigencia && new Date(w.ds3_vigencia) - now < 30*24*60*60*1000 ? 'por_vencer' : 'vigente')),
     }))
   },
+
+  async getRbacData() {
+    await delay()
+    return {
+      roles: [
+        { key: 'admin', label: 'Administrador', description: 'Acceso completo a todos los módulos. Puede crear, editar, eliminar, corregir y auditar.' },
+        { key: 'encargado', label: 'Encargado de Obra', description: 'Gestión limitada a su obra asignada. Registra asistencia, ve trabajadores de su obra.' },
+        { key: 'nomina', label: 'Encargado de Nómina', description: 'Calcula, corrige y cierra nóminas. Acceso a reportes financieros.' },
+        { key: 'contratista', label: 'Contratista', description: 'Consulta reportes de sus trabajadores asignados. Sin permisos de escritura.' },
+      ],
+      users: [
+        { id: 1, name: 'Admin Demo', email: 'admin@constructora.com', role: 'admin', active: true, filtro: 'Global' },
+        { id: 2, name: 'Encargado Demo', email: 'encargado@constructora.com', role: 'encargado', active: true, filtro: 'Obra 1: Edif. Corporativo Reforma' },
+        { id: 3, name: 'Personal Nómina', email: 'nomina@constructora.com', role: 'nomina', active: true, filtro: 'Global' },
+        { id: 4, name: 'Contratista Ext.', email: 'contratista@externo.com', role: 'contratista', active: true, filtro: 'Contratista: Construcciones y Edif. Prof.' },
+      ],
+      groups: [
+        { key: 'gestion_trabajadores', label: 'Gestión de Trabajadores', color: 'bg-blue-50 text-blue-700 border-blue-200', permissions: ['workers.read','workers.write','workers.delete'] },
+        { key: 'gestion_obras', label: 'Gestión de Obras', color: 'bg-emerald-50 text-emerald-700 border-emerald-200', permissions: ['worksites.read','worksites.write'] },
+        { key: 'gestion_asistencia', label: 'Gestión de Asistencia', color: 'bg-green-50 text-green-700 border-green-200', permissions: ['attendance.read','attendance.write','attendance.correct'] },
+        { key: 'gestion_nomina', label: 'Gestión de Nómina', color: 'bg-violet-50 text-violet-700 border-violet-200', permissions: ['payroll.read','payroll.correct','payroll.close'] },
+        { key: 'reportes', label: 'Reportes', color: 'bg-amber-50 text-amber-700 border-amber-200', permissions: ['reports.read','reports.export'] },
+        { key: 'seguridad', label: 'Seguridad y Auditoría', color: 'bg-gray-100 text-gray-700 border-gray-300', permissions: ['audit.read','users.read','users.write','rbac.read','rbac.write'] },
+        { key: 'certificaciones', label: 'Certificaciones DS3', color: 'bg-indigo-50 text-indigo-700 border-indigo-200', permissions: ['ds3.read','ds3.write'] },
+      ],
+      permissions: [
+        { key: 'workers.read', label: 'Ver trabajadores' }, { key: 'workers.write', label: 'Crear/editar trabajadores' }, { key: 'workers.delete', label: 'Eliminar trabajadores' },
+        { key: 'worksites.read', label: 'Ver obras' }, { key: 'worksites.write', label: 'Crear/editar obras' },
+        { key: 'attendance.read', label: 'Ver asistencia' }, { key: 'attendance.write', label: 'Registrar asistencia' }, { key: 'attendance.correct', label: 'Corregir asistencia' },
+        { key: 'payroll.read', label: 'Ver nómina' }, { key: 'payroll.correct', label: 'Corregir nómina' }, { key: 'payroll.close', label: 'Cerrar período' },
+        { key: 'reports.read', label: 'Ver reportes' }, { key: 'reports.export', label: 'Exportar reportes' },
+        { key: 'audit.read', label: 'Ver auditoría' },
+        { key: 'users.read', label: 'Ver usuarios' }, { key: 'users.write', label: 'Gestionar usuarios y roles' },
+        { key: 'rbac.read', label: 'Ver configuración RBAC' }, { key: 'rbac.write', label: 'Modificar RBAC' },
+        { key: 'ds3.read', label: 'Ver DS3' }, { key: 'ds3.write', label: 'Gestionar DS3' },
+      ],
+      matriz: [
+        { recurso: 'Trabajadores', roles: { admin: 'read, write, delete', encargado: 'read', nomina: 'read', contratista: 'read' } },
+        { recurso: 'Obras', roles: { admin: 'read, write', encargado: 'read', nomina: 'read', contratista: '—' } },
+        { recurso: 'Contratistas', roles: { admin: 'read, write', encargado: '—', nomina: 'read', contratista: '—' } },
+        { recurso: 'Asistencia', roles: { admin: 'read, write, correct', encargado: 'read, write', nomina: 'read', contratista: '—' } },
+        { recurso: 'Nómina', roles: { admin: 'read, correct, close', encargado: 'read', nomina: 'read, correct', contratista: 'read' } },
+        { recurso: 'Reportes', roles: { admin: 'read, export', encargado: 'read', nomina: 'read, export', contratista: 'read' } },
+        { recurso: 'Auditoría', roles: { admin: 'read', encargado: '—', nomina: '—', contratista: '—' } },
+        { recurso: 'Usuarios / RBAC', roles: { admin: 'read, write', encargado: '—', nomina: '—', contratista: '—' } },
+        { recurso: 'Certificaciones DS3', roles: { admin: 'read, write', encargado: 'read', nomina: 'read', contratista: '—' } },
+      ],
+    }
+  },
 }
