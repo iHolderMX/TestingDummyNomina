@@ -1,14 +1,22 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api.js'
-import { Briefcase, Users, Phone, ChevronDown, ChevronUp, Home, Car, Wrench } from 'lucide-react'
+import { Users, Briefcase, ChevronDown, ChevronUp, Home, Utensils, Wrench, FileSpreadsheet, Building2, Hash } from 'lucide-react'
 
 export default function Contractors() {
   const [contractors, setContractors] = useState([])
+  const [contratos, setContratos] = useState([])
   const [loading, setLoading] = useState(true)
   const [expanded, setExpanded] = useState(null)
 
   useEffect(() => {
-    api.getContractors().then(data => { setContractors(data); setLoading(false) })
+    Promise.all([
+      api.getContractors(),
+      api.getContratos(),
+    ]).then(([cData, ctosData]) => {
+      setContractors(cData)
+      setContratos(ctosData)
+      setLoading(false)
+    })
   }, [])
 
   if (loading) return (
@@ -105,6 +113,40 @@ export default function Contractors() {
                       <p className="text-gray-400 text-xs italic">Sin préstamo de herramienta</p>
                     )}
                   </div>
+                </div>
+
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                  {(() => {
+                    const ctos = contratos.filter(cto => cto.contratista_id === c.id)
+                    return (
+                      <>
+                        <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1.5 mb-3">
+                          <FileSpreadsheet size={13} />Contratos y SIROCs ({ctos.length})
+                        </h4>
+                        {ctos.length > 0 ? (
+                          <div className="space-y-2">
+                            {ctos.map(cto => (
+                              <div key={cto.id} className="p-2.5 bg-indigo-50 rounded-lg text-xs">
+                                <div className="flex items-center justify-between mb-1">
+                                  <span className="font-mono font-bold text-gray-800">{cto.numero_contrato}</span>
+                                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-white text-indigo-700 border border-indigo-200">
+                                    <Hash size={9} />{cto.siroc}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-2 text-[10px]">
+                                  <span className="text-gray-400 flex items-center gap-1"><Building2 size={9} />{cto.obra_name}</span>
+                                  <span className="text-emerald-600 font-medium">${cto.monto?.toLocaleString()}</span>
+                                  <span className="text-gray-400">({cto.tipo_trabajo})</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-gray-400 text-xs italic">Sin contratos asignados</p>
+                        )}
+                      </>
+                    )
+                  })()}
                 </div>
               </div>
             )}

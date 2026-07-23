@@ -168,17 +168,23 @@ const workers = [
     ds3_activo: true, ds3_vigencia: '2027-03-01', ds3_norma: 'NOM-031-STPS-2011', incapacidades: [] },
 ]
 
+// Vincular cada trabajador a un contrato según contractor_id + obra principal
+// contrato_id permite trazar: trabajador → contratista → contrato → obra → SIROC
+const contratoMap = {
+  '1-1': 1, // Contratista 1 en Obra 1 → Contrato 1 → SIROC-2026-001
+  '2-1': 2, // Contratista 2 en Obra 1 → Contrato 2 → SIROC-2026-002
+  '1-2': 3, // Contratista 1 en Obra 2 → Contrato 3 → SIROC-2026-003
+  '2-2': 4, // Contratista 2 en Obra 2 → Contrato 4 → SIROC-2026-004
+}
+workers.forEach(w => {
+  w.contrato_id = (w.contractor_id && w.obra_ids.length > 0)
+    ? (contratoMap[`${w.contractor_id}-${w.obra_ids[0]}`] || null)
+    : null
+})
+
 const worksites = [
-  { id: 1, name: 'Edificio Corporativo Reforma', location: 'Av. Paseo de la Reforma #342, Col. Juárez', active: 1, worker_count: 20,
-    numero_contrato: 'CTO-2026-001', cliente: 'Grupo Inmobiliario Reforma S.A.',
-    fianza_monto: 5000000, fianza_vigencia: '2027-03-01',
-    addendums: [{ fecha: '2026-04-01', tipo: 'ampliacion', monto_original: 5000000, monto_nuevo: 6500000, motivo: 'Extras en fachada' }],
-    monto_contrato: 6500000, monto_imss: 320000, monto_infonavit: 95000, monto_mano_obra: 1800000, numero_ziroc: 'ZRG-2026-001' },
-  { id: 2, name: 'Residencial Las Lomas', location: 'Blvd. Adolfo López Mateos #120, Col. Lomas de Chapultepec', active: 1, worker_count: 10,
-    numero_contrato: 'CTO-2026-002', cliente: 'Desarrollos Las Lomas S.A.',
-    fianza_monto: 3500000, fianza_vigencia: '2026-12-01',
-    addendums: [],
-    monto_contrato: 3500000, monto_imss: 210000, monto_infonavit: 62000, monto_mano_obra: 1200000, numero_ziroc: 'ZRG-2026-002' },
+  { id: 1, name: 'Edificio Corporativo Reforma', location: 'Av. Paseo de la Reforma #342, Col. Juárez', active: 1, worker_count: 20 },
+  { id: 2, name: 'Residencial Las Lomas', location: 'Blvd. Adolfo López Mateos #120, Col. Lomas de Chapultepec', active: 1, worker_count: 10 },
 ]
 
 const contractors = [
@@ -193,6 +199,26 @@ const contractors = [
     casas: [{ direccion: 'Calle Ferrocarril #12, Col. Morelos, CDMX', costo_mensual: 7000 }],
     viaticos_monto: 2500, viaticos_periodo: 'trimestral',
     prestamo_herramienta: null },
+]
+
+const contratos = [
+  { id: 1, obra_id: 1, contratista_id: 1, numero_contrato: 'CTO-2026-001', cliente: 'Grupo Inmobiliario Reforma S.A.',
+    monto: 4000000, monto_mano_obra: 1200000, fecha_inicio: '2026-01-15', fecha_fin: '2026-12-31',
+    tipo_trabajo: 'Albañilería y acabados generales', fianza_monto: 3000000, fianza_vigencia: '2027-03-01',
+    addendums: [{ fecha: '2026-04-01', tipo: 'ampliacion', monto_original: 4000000, monto_nuevo: 5000000, motivo: 'Extras en fachada' }],
+    monto_imss: 200000, monto_infonavit: 60000, siroc: 'SIROC-2026-001', activo: true },
+  { id: 2, obra_id: 1, contratista_id: 2, numero_contrato: 'CTO-2026-002', cliente: 'Grupo Inmobiliario Reforma S.A.',
+    monto: 1500000, monto_mano_obra: 600000, fecha_inicio: '2026-02-01', fecha_fin: '2026-11-30',
+    tipo_trabajo: 'Instalaciones eléctricas e hidrosanitarias', fianza_monto: 500000, fianza_vigencia: '2026-12-01',
+    addendums: [], monto_imss: 120000, monto_infonavit: 35000, siroc: 'SIROC-2026-002', activo: true },
+  { id: 3, obra_id: 2, contratista_id: 1, numero_contrato: 'CTO-2026-003', cliente: 'Desarrollos Las Lomas S.A.',
+    monto: 2500000, monto_mano_obra: 800000, fecha_inicio: '2026-03-01', fecha_fin: '2027-02-28',
+    tipo_trabajo: 'Albañilería y estructura', fianza_monto: 3500000, fianza_vigencia: '2027-05-01',
+    addendums: [], monto_imss: 160000, monto_infonavit: 48000, siroc: 'SIROC-2026-003', activo: true },
+  { id: 4, obra_id: 2, contratista_id: 2, numero_contrato: 'CTO-2026-004', cliente: 'Desarrollos Las Lomas S.A.',
+    monto: 1000000, monto_mano_obra: 400000, fecha_inicio: '2026-03-15', fecha_fin: '2026-10-31',
+    tipo_trabajo: 'Instalaciones especiales y acabados', fianza_monto: 2500000, fianza_vigencia: '2026-11-15',
+    addendums: [], monto_imss: 50000, monto_infonavit: 14000, siroc: 'SIROC-2026-004', activo: true },
 ]
 
 const dates = ['2026-05-21','2026-05-22','2026-05-23','2026-05-24','2026-05-25','2026-05-26','2026-05-27']
@@ -285,6 +311,28 @@ export const mockApi = {
   async getContractors() { await delay(); return contractors.map(c => ({...c})) },
   async getContractor(id) { await delay(); const c = contractors.find(x => x.id === Number(id)); if (!c) throw new Error('No encontrado'); return {...c} },
 
+  async getContratos(filters = {}) {
+    await delay()
+    let result = contratos.map(c => {
+      const obra = worksites.find(w => w.id === c.obra_id)
+      const cont = contractors.find(co => co.id === c.contratista_id)
+      return { ...c, obra_name: obra?.name, contratista_name: cont?.name }
+    })
+    if (filters.obra_id) result = result.filter(c => c.obra_id === Number(filters.obra_id))
+    if (filters.contratista_id) result = result.filter(c => c.contratista_id === Number(filters.contratista_id))
+    return result
+  },
+  async getContratosByObra(obra_id) { await delay(); return contratos.filter(c => c.obra_id === Number(obra_id)) },
+  async getContratosByContratista(contratista_id) { await delay(); return contratos.filter(c => c.contratista_id === Number(contratista_id)) },
+  async getSirocsByObra(obra_id) {
+    await delay()
+    return contratos.filter(c => c.obra_id === Number(obra_id)).map(c => ({
+      contrato_id: c.id, numero_contrato: c.numero_contrato, siroc: c.siroc,
+      contratista_name: contractors.find(co => co.id === c.contratista_id)?.name || 'N/A',
+      monto: c.monto, tipo_trabajo: c.tipo_trabajo,
+    }))
+  },
+
   async getAttendances() { await delay(); return attendanceRecords.map(r => ({...r})) },
   async getAttendanceSummary() { await delay(); return attendanceSummary.map(s => ({...s})) },
 
@@ -357,14 +405,17 @@ export const mockApi = {
 
   async getContractorsByWorksites() {
     await delay()
-    return [
-      { contractor_name: 'Construcciones y Edificaciones Profesionales S.A. de C.V.', worksite_name: 'Edificio Corporativo Reforma', worker_count: 3 },
-      { contractor_name: 'Instalaciones y Servicios Técnicos Integrales S.A.', worksite_name: 'Edificio Corporativo Reforma', worker_count: 2 },
-      { contractor_name: 'Instalaciones y Servicios Técnicos Integrales S.A.', worksite_name: 'Residencial Las Lomas', worker_count: 2 },
-      { contractor_name: 'Construcciones y Edificaciones Profesionales S.A. de C.V.', worksite_name: 'Residencial Las Lomas', worker_count: 2 },
-      { contractor_name: 'Sin contratista', worksite_name: 'Edificio Corporativo Reforma', worker_count: 2 },
-      { contractor_name: 'Sin contratista', worksite_name: 'Residencial Las Lomas', worker_count: 0 },
-    ]
+    return contratos.map(c => {
+      const obra = worksites.find(w => w.id === c.obra_id)
+      const cont = contractors.find(co => co.id === c.contratista_id)
+      return {
+        contractor_name: cont?.name || 'N/A',
+        worksite_name: obra?.name || 'N/A',
+        worker_count: workers.filter(w => w.contrato_id === c.id).length,
+        numero_contrato: c.numero_contrato,
+        siroc: c.siroc,
+      }
+    })
   },
 
   async getTopOvertime() {
@@ -381,13 +432,20 @@ export const mockApi = {
     await delay()
     return worksites.map(ws => {
       const wsPayroll = payroll.filter(p => p.worksite_name === ws.name)
+      const wsContratos = contratos.filter(c => c.obra_id === ws.id)
+      const montoTotal = wsContratos.reduce((s, c) => s + c.monto, 0)
+      const montoMO = wsContratos.reduce((s, c) => s + c.monto_mano_obra, 0)
+      const montoIMSS = wsContratos.reduce((s, c) => s + c.monto_imss, 0)
+      const montoInfonavit = wsContratos.reduce((s, c) => s + c.monto_infonavit, 0)
       return {
         name: ws.name, worker_count: ws.worker_count,
         total_devengado: wsPayroll.reduce((s, p) => s + p.total_devengado, 0),
         total_deducciones: wsPayroll.reduce((s, p) => s + p.total_deducciones, 0),
         total_neto: wsPayroll.reduce((s, p) => s + p.total_neto, 0),
-        monto_contrato: ws.monto_contrato, monto_mano_obra: ws.monto_mano_obra,
-        monto_imss: ws.monto_imss, monto_infonavit: ws.monto_infonavit,
+        monto_contrato: montoTotal, monto_mano_obra: montoMO,
+        monto_imss: montoIMSS, monto_infonavit: montoInfonavit,
+        contratos_count: wsContratos.length,
+        sirocs: wsContratos.map(c => c.siroc),
       }
     })
   },
