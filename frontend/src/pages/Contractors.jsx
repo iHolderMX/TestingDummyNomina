@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api.js'
-import { Users, Briefcase, ChevronDown, ChevronUp, Home, Utensils, Wrench, FileSpreadsheet, Building2, Hash } from 'lucide-react'
+import { Users, Briefcase, Phone, ChevronDown, ChevronUp, Home, Car, Utensils, Wrench, FileSpreadsheet, Building2, Hash } from 'lucide-react'
 
 export default function Contractors() {
   const [contractors, setContractors] = useState([])
